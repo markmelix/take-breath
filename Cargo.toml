@@ -1,0 +1,20 @@
+[package]
+name        = "take-breath"
+description = "A program that reminds you when to take a breath from your computer."
+repository  = "https://github.com/markmelix/take-breath"
+authors     = ["Mark Meliksetyan <markmelix@gmail.com>"]
+keywords    = ["computer-hygiene", "health"]
+categories  = ["accessibility", "command-line-utilities", "date-and-time"]
+license     = "MIT"
+readme      = "README.org"
+edition     = "2018"
+version     = "0.1.0"
+
+[dependencies]
+notify-rust = "4.5.2"
+user-idle = "0.5.0"
+fslock = "0.1.6"
+
+[dependencies.tokio]
+version = "1.9.0"
+features = ["full", "time"]
