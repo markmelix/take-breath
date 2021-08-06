@@ -13,17 +13,26 @@ fn main() {
 }
 
 fn work_counter() {
-    for _ in 0..(45 * 60) {
-	if idle_time() < 2 * 60 {
+    let mut ctr = 0;
+    while ctr < 45 * 60 {
+	if idle_time() < 60 {
 	    wait(1);
+	    ctr += 1;
 	} else {
 	    idle_while_work_trigger();
+	    loop {
+		if idle_time() == 0 {
+		    work_resumed_trigger();
+		    break;
+		}
+	    }
 	}
+	println!("{} ", ctr);
     }
 }
 
 fn rest_counter() {
-    for _ in 0..(15 * 60) {
+    for ctr in 0..(15 * 60) {
 	if idle_time() > 0 {
 	    wait(1);
 	} else {
@@ -57,7 +66,7 @@ fn work_trigger() {
 
 fn short_rest_trigger() {
     Notification::new()
-	.summary("Take a breath more!")
+	.summary("Take a breath")
 	.body("You had too little rest!")
 	.timeout(Timeout::Milliseconds(5000))
 	.show()
@@ -68,6 +77,15 @@ fn idle_while_work_trigger() {
     Notification::new()
 	.summary("Take a breath")
 	.body("Idle while work counter started")
+	.timeout(Timeout::Milliseconds(5000))
+	.show()
+	.unwrap();
+}
+
+fn work_resumed_trigger() {
+    Notification::new()
+	.summary("Take a breath")
+	.body("Work has been resumed")
 	.timeout(Timeout::Milliseconds(5000))
 	.show()
 	.unwrap();
