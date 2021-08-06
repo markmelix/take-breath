@@ -1,15 +1,15 @@
 # Table of Contents
 
-1.  [Take Breath](#org1ebe878)
-2.  [Algorithm](#orgb5a9440)
-3.  [Roadmap](#orgd93afe6)
-4.  [Building](#orgf01c00a)
-5.  [Usage](#org9dff6d1)
-6.  [License](#org208238b)
-7.  [Contribution](#orgc1ebf01)
+1.  [Take Breath](#org9d2feaa)
+2.  [Algorithm](#orgca37786)
+3.  [Roadmap](#orgb27651a)
+4.  [Building](#org884326c)
+5.  [Usage](#orgb42dbdc)
+6.  [License](#org5ffc384)
+7.  [Contribution](#org1a25e23)
 
 
-<a id="org1ebe878"></a>
+<a id="org9d2feaa"></a>
 
 # Take Breath
 
@@ -17,7 +17,7 @@ Take Breath is a program that reminds you when it is time to take a breath
 from your computer.
 
 
-<a id="orgb5a9440"></a>
+<a id="orgca37786"></a>
 
 # Algorithm
 
@@ -28,16 +28,16 @@ less than 15 minutes, program notifies you that your rest is too short and you
 should rest more. Otherwise it starts a work time counter again.
 
 
-<a id="orgd93afe6"></a>
+<a id="orgb27651a"></a>
 
 # Roadmap
 
 -   [X] Basic algorithm implementation
 -   [X] Handle idle while work
--   [ ] Split app into library and binary parts
+-   [X] Split app into library and binary parts
+-   [ ] Customization features
 -   [ ] CLI implementation
 -   [ ] Better error handling
--   [ ] Customization features
 -   [ ] Documentation
 -   [-] Support for various operating systems
 	-   [X] Linux (X only)
@@ -45,7 +45,7 @@ should rest more. Otherwise it starts a work time counter again.
 	-   [ ] Windows
 
 
-<a id="orgf01c00a"></a>
+<a id="org884326c"></a>
 
 # Building
 
@@ -63,7 +63,7 @@ using the following command: "cargo install take-breath". It puts compiled
 take-breath file into the ~/.cargo/bin directory.
 
 
-<a id="org9dff6d1"></a>
+<a id="orgb42dbdc"></a>
 
 # Usage
 
@@ -73,14 +73,14 @@ Just run the following command in a terminal: "`take-breath
   &`". It executes `take-breath` program as a background process.
 
 
-<a id="org208238b"></a>
+<a id="org5ffc384"></a>
 
 # License
 
 Take Breath is provided under [MIT License](./LICENSE).
 
 
-<a id="orgc1ebf01"></a>
+<a id="org1a25e23"></a>
 
 # Contribution
 

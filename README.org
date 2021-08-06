@@ -12,10 +12,10 @@
 * Roadmap
   - [X] Basic algorithm implementation
   - [X] Handle idle while work
-  - [ ] Split app into library and binary parts
+  - [X] Split app into library and binary parts
+  - [ ] Customization features
   - [ ] CLI implementation
   - [ ] Better error handling
-  - [ ] Customization features
   - [ ] Documentation
   - [-] Support for various operating systems
     - [X] Linux (X only)
