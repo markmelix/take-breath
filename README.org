@@ -1,7 +1,11 @@
 #+OPTIONS: ^:nil
 #+OPTIONS: toc:nil
 
-#+html: <a href="https://docs.rs/take-breath"><img src="https://docs.rs/take-breath/badge.svg"></a><a href="https://crates.io/crates/take-breath"><img src="https://img.shields.io/crates/v/take-breath.svg"></a><a href="./LICENSE"><img src="https://img.shields.io/crates/l/take-breath.svg"></a>
+#+begin_export html
+<a href="https://docs.rs/take-breath" style="margin-right: 10px"><img src="https://docs.rs/take-breath/badge.svg"></a>
+<a href="https://crates.io/crates/take-breath" style="margin-right: 10px"><img src="https://img.shields.io/crates/v/take-breath.svg"></a>
+<a href="./LICENSE"><img src="https://img.shields.io/crates/l/take-breath.svg"></a>
+#+end_export
 
 #+TOC: headlines 2
 

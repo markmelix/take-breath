@@ -1,4 +1,6 @@
-<a href="https://docs.rs/take-breath"><img src="https://docs.rs/take-breath/badge.svg"></a><a href="https://crates.io/crates/take-breath"><img src="https://img.shields.io/crates/v/take-breath.svg"></a><a href="./LICENSE"><img src="https://img.shields.io/crates/l/take-breath.svg"></a>
+<a href="https://docs.rs/take-breath" style="margin-right: 10px"><img src="https://docs.rs/take-breath/badge.svg"></a>
+<a href="https://crates.io/crates/take-breath" style="margin-right: 10px"><img src="https://img.shields.io/crates/v/take-breath.svg"></a>
+<a href="./LICENSE"><img src="https://img.shields.io/crates/l/take-breath.svg"></a>
 
 
 # Table of Contents
