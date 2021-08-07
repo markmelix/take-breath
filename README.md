@@ -10,6 +10,7 @@
 8.  [Contribution](#contribution)
 
 
+
 <a id="introdution"></a>
 
 # Take Breath
@@ -100,7 +101,7 @@ directories depending on the system:
 <tbody>
 <tr>
 <td class="org-left">Linux</td>
-<td class="org-left">$XDG<sub>CONFIG</sub><sub>HOME</sub> or $HOME/.config</td>
+<td class="org-left">$XDG_CONFIG_HOME or $HOME/.config</td>
 </tr>
 
 
@@ -149,21 +150,21 @@ Description of each field:
 
 <tbody>
 <tr>
-<td class="org-left">work<sub>time.duration</sub></td>
+<td class="org-left">work_time.duration</td>
 <td class="org-left">Work duration</td>
 <td class="org-left">45m</td>
 </tr>
 
 
 <tr>
-<td class="org-left">work<sub>time.idle</sub><sub>to</sub><sub>pause</sub></td>
+<td class="org-left">work_time.idle_to_pause</td>
 <td class="org-left">How much time computer have to be idle to pause work time counter</td>
 <td class="org-left">2m</td>
 </tr>
 
 
 <tr>
-<td class="org-left">rest<sub>time.duration</sub></td>
+<td class="org-left">rest_time.duration</td>
 <td class="org-left">Rest duration</td>
 <td class="org-left">15m</td>
 </tr>

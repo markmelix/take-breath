@@ -1,3 +1,5 @@
+#+OPTIONS: ^:nil
+
 * Take Breath
   :PROPERTIES:
   :CUSTOM_ID: introdution
@@ -85,8 +87,6 @@ duration = '15m'
   | work_time.duration      | Work duration                                                     | 45m           |
   | work_time.idle_to_pause | How much time computer have to be idle to pause work time counter | 2m            |
   | rest_time.duration      | Rest duration                                                     | 15m           |
-
-
 
 * License
   :PROPERTIES:
