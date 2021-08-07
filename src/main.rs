@@ -44,10 +44,9 @@ fn main() {
 			    return;
 			}
 		    };
-		    write!(&mut config_file, "{}\n\n{}", CONFIG_COMMENT_STRING, config_toml.as_bytes());
-		    // if let Err(e) = config_file.write_all(config_toml.as_bytes()) {
-		    //	eprintln!("Failed to write config data to the file: {}", e);
-		    // }
+		    if let Err(e) = write!(&mut config_file, "{}\n\n{}", CONFIG_COMMENT_STRING, config_toml) {
+			eprintln!("Failed to write config data to the file: {}", e);
+		    }
 		}
 	    }
 	}
