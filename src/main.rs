@@ -8,8 +8,7 @@ use lib::counter::*;
 
 const CONFIG_DIR: &str = "take-breath";
 const CONFIG_FILE: &str = "config.toml";
-const CONFIG_COMMENT_STRING: &str = r#"
-# Configuration for Take Breath
+const CONFIG_COMMENT_STRING: &str = r#"# Configuration for Take Breath
 # See https://github.com/markmelix/take-breath#customization"#;
 
 fn main() {
