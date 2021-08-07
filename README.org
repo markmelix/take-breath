@@ -1,5 +1,9 @@
 #+OPTIONS: ^:nil
 
+#+html: <a href="https://docs.rs/take-breath"><img src="https://docs.rs/take-breath/badge.svg"></a>
+#+html: <a href="https://crates.io/crates/take-breath"><img src="https://img.shields.io/crates/v/take-breath.svg"></a>
+#+html: <a href="./LICENSE"><img src="https://img.shields.io/crates/l/take-breath.svg"></a>
+
 * Take Breath
   :PROPERTIES:
   :CUSTOM_ID: introdution
@@ -25,13 +29,15 @@
   - [X] Handle idle while work
   - [X] Split app into library and binary parts
   - [X] Customization features
+  - [ ] Action customization features
+  - [X] Better error handling
+  - [ ] Auto-start features
   - [ ] CLI implementation
-  - [ ] Better error handling
   - [ ] Documentation
   - [-] Support for various operating systems
     - [X] Linux (X only)
-    - [ ] Mac
-    - [ ] Windows
+    - [ ] Mac (not tested)
+    - [ ] Windows (not tested)
 
 * Building
   :PROPERTIES:

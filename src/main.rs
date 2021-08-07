@@ -52,7 +52,8 @@ fn main() {
 	None => eprintln!("Error: config directory not found"),
     }
 
-    config.apply_env();
+    #[cfg(debug_assertions)]
+    println!("{:#?}", config);
 
     let work = Work::new(
 	config.work_time.duration,

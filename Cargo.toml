@@ -8,7 +8,7 @@ categories  = ["accessibility", "command-line-utilities", "date-and-time"]
 license     = "MIT"
 readme      = "README.md"
 edition     = "2018"
-version     = "0.1.3"
+version     = "0.1.4"
 
 [dependencies]
 notify-rust = "4.5.2"

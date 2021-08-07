@@ -1,13 +1,10 @@
 pub mod config {
-    #![allow(dead_code)]
-
     use toml;
     use std::path::Path;
     use serde::{Serialize, Deserialize};
     use std::time::Duration;
     use std::error::Error;
     use std::fs;
-    use std::env;
 
     #[derive(Serialize, Deserialize, Default, Debug)]
     pub struct Config {
@@ -30,19 +27,6 @@ pub mod config {
 		Err(_) => Self::default(),
 	    }
 	}
-
-	pub fn from_env() -> Self {
-	    Self {
-		work_time: WorkTime::from_env(),
-		rest_time: RestTime::from_env(),
-	    }
-	}
-
-	pub fn apply_env(&mut self) {
-	    let env_self = Self::from_env();
-	    self.work_time.replace_defaults(env_self.work_time);
-	    self.rest_time.replace_defaults(env_self.rest_time);
-	}
     }
 
     #[derive(Serialize, Deserialize, Debug)]
@@ -63,34 +47,6 @@ pub mod config {
 
 	fn default_idle_to_pause() -> Duration {
 	    Duration::from_secs(2 * 60)
-	}
-
-	fn from_env() -> Self {
-	    Self {
-		duration: match env::var("TAKE_BREATH_WORK_TIME_DURATION") {
-		    Ok(value) => match humantime::parse_duration(&value) {
-			Ok(value) => value,
-			Err(_) => Self::default_duration(),
-		    },
-		    Err(_) => Self::default_duration(),
-		},
-		idle_to_pause: match env::var("TAKE_BREATH_WORK_TIME_IDLE_TO_PAUSE") {
-		    Ok(value) => match humantime::parse_duration(&value) {
-			Ok(value) => value,
-			Err(_) => Self::default_idle_to_pause(),
-		    },
-		    Err(_) => Self::default_idle_to_pause(),
-		},
-	    }
-	}
-
-	fn replace_defaults(&mut self, repl: Self) {
-	    if self.duration != repl.duration && self.duration == Self::default_duration() {
-		self.duration = repl.duration;
-	    }
-	    if self.idle_to_pause != repl.idle_to_pause && self.idle_to_pause == Self::default_idle_to_pause() {
-		self.idle_to_pause = repl.idle_to_pause;
-	    }
 	}
     }
 
@@ -113,24 +69,6 @@ pub mod config {
     impl RestTime {
 	fn default_duration() -> Duration {
 	    Duration::from_secs(15 * 60)
-	}
-
-	fn from_env() -> Self {
-	    Self {
-		duration: match env::var("TAKE_BREATH_REST_TIME_DURATION") {
-		    Ok(value) => match humantime::parse_duration(&value) {
-			Ok(value) => value,
-			Err(_) => Self::default_duration(),
-		    },
-		    Err(_) => Self::default_duration(),
-		},
-	    }
-	}
-
-	fn replace_defaults(&mut self, repl: Self) {
-	    if self.duration != repl.duration && self.duration == Self::default_duration() {
-		self.duration = repl.duration;
-	    }
 	}
     }
 
@@ -252,7 +190,7 @@ pub mod counter {
 		if idle_time() > 0 {
 		    ctr += 1;
 		} else {
-		    self.short_rest_trigger();
+		    self.short_rest_trigger(Duration::from_secs(ctr));
 		    loop {
 			if idle_time() > 0 {
 			    self.rest_resumed_trigger();
@@ -274,10 +212,11 @@ pub mod counter {
 	}
 
 	/// Function to run when the rest is too short.
-	fn short_rest_trigger(&self) {
+	fn short_rest_trigger(&self, ctr: Duration) {
+	    let left = (self.rest_dur - ctr).as_secs() as f32 / 60.0;
 	    Notification::new()
 		.summary("Take a breath")
-		.body("You had too little rest!")
+		.body(&format!("You had too little rest!\n{:.2} minutes left.", left))
 		.timeout(Timeout::Milliseconds(10000))
 		.show()
 		.unwrap();
