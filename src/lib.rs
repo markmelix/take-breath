@@ -1,159 +1,306 @@
-use notify_rust::{Notification, Timeout};
-use user_idle::UserIdle;
-use std::time::Duration;
-use std::thread;
+pub mod config {
+    #![allow(dead_code)]
 
-/// Work time counter structure.
-pub struct Work {
-    /// Work duration.
-    work_dur: Duration,
+    use toml;
+    use std::path::Path;
+    use serde::{Serialize, Deserialize};
+    use std::time::Duration;
+    use std::error::Error;
+    use std::fs;
+    use std::env;
 
-    /// How much time computer have to be idle to disable work time counting.
-    idle_dur: Duration,
-}
+    #[derive(Serialize, Deserialize, Default, Debug)]
+    pub struct Config {
+	#[serde(default)]
+	pub work_time: WorkTime,
 
-impl Work {
-    /// Returns a new work time counter.
-    pub fn new(work_dur: Duration, idle_dur: Duration) -> Self {
-	Self {
-	    work_dur,
-	    idle_dur,
+	#[serde(default)]
+	pub rest_time: RestTime,
+    }
+
+    impl Config {
+	pub fn from_file<T: AsRef<Path>>(path: T) -> Result<Self, Box<dyn Error>> {
+	    let file_data = fs::read_to_string(path)?;
+	    Ok(toml::from_str(&file_data)?)
+	}
+
+	pub fn apply_from_file<T: AsRef<Path>>(path: T) -> Self {
+	    match Self::from_file(path) {
+		Ok(config) => config,
+		Err(_) => Self::default(),
+	    }
+	}
+
+	pub fn from_env() -> Self {
+	    Self {
+		work_time: WorkTime::from_env(),
+		rest_time: RestTime::from_env(),
+	    }
+	}
+
+	pub fn apply_env(&mut self) {
+	    let env_self = Self::from_env();
+	    self.work_time.replace_defaults(env_self.work_time);
+	    self.rest_time.replace_defaults(env_self.rest_time);
 	}
     }
 
-    /// Starts a work time counter.
-    pub fn count(&self) {
-	let mut ctr = 0;
-	let idle_dur = self.idle_dur.as_secs();
-	let work_dur = self.work_dur.as_secs();
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct WorkTime {
+	#[serde(with = "humantime_serde")]
+	#[serde(default = "WorkTime::default_duration")]
+	pub duration: Duration,
 
-	self.trigger();
-	while ctr < work_dur {
-	    if idle_time() < idle_dur {
-		wait(1);
-		ctr += 1;
-	    } else {
-		if (ctr as i32 - idle_dur as i32) <= 0 {
-		    ctr = 0;
+	#[serde(with = "humantime_serde")]
+	#[serde(default = "WorkTime::default_idle_to_pause")]
+	pub idle_to_pause: Duration,
+    }
+
+    impl WorkTime {
+	fn default_duration() -> Duration {
+	    Duration::from_secs(45 * 60)
+	}
+
+	fn default_idle_to_pause() -> Duration {
+	    Duration::from_secs(2 * 60)
+	}
+
+	fn from_env() -> Self {
+	    Self {
+		duration: match env::var("TAKE_BREATH_WORK_TIME_DURATION") {
+		    Ok(value) => match humantime::parse_duration(&value) {
+			Ok(value) => value,
+			Err(_) => Self::default_duration(),
+		    },
+		    Err(_) => Self::default_duration(),
+		},
+		idle_to_pause: match env::var("TAKE_BREATH_WORK_TIME_IDLE_TO_PAUSE") {
+		    Ok(value) => match humantime::parse_duration(&value) {
+			Ok(value) => value,
+			Err(_) => Self::default_idle_to_pause(),
+		    },
+		    Err(_) => Self::default_idle_to_pause(),
+		},
+	    }
+	}
+
+	fn replace_defaults(&mut self, repl: Self) {
+	    if self.duration != repl.duration && self.duration == Self::default_duration() {
+		self.duration = repl.duration;
+	    }
+	    if self.idle_to_pause != repl.idle_to_pause && self.idle_to_pause == Self::default_idle_to_pause() {
+		self.idle_to_pause = repl.idle_to_pause;
+	    }
+	}
+    }
+
+    impl Default for WorkTime {
+	fn default() -> Self {
+	    Self {
+		duration: Self::default_duration(),
+		idle_to_pause: Self::default_idle_to_pause(),
+	    }
+	}
+    }
+
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct RestTime {
+	#[serde(with = "humantime_serde")]
+	#[serde(default = "RestTime::default_duration")]
+	pub duration: Duration,
+    }
+
+    impl RestTime {
+	fn default_duration() -> Duration {
+	    Duration::from_secs(15 * 60)
+	}
+
+	fn from_env() -> Self {
+	    Self {
+		duration: match env::var("TAKE_BREATH_REST_TIME_DURATION") {
+		    Ok(value) => match humantime::parse_duration(&value) {
+			Ok(value) => value,
+			Err(_) => Self::default_duration(),
+		    },
+		    Err(_) => Self::default_duration(),
+		},
+	    }
+	}
+
+	fn replace_defaults(&mut self, repl: Self) {
+	    if self.duration != repl.duration && self.duration == Self::default_duration() {
+		self.duration = repl.duration;
+	    }
+	}
+    }
+
+    impl Default for RestTime {
+	fn default() -> Self {
+	    Self {
+		duration: Self::default_duration(),
+	    }
+	}
+    }
+}
+
+pub mod counter {
+    use notify_rust::{Notification, Timeout};
+    use user_idle::UserIdle;
+    use std::time::Duration;
+    use std::thread;
+
+    /// Work time counter structure.
+    pub struct Work {
+	/// Work duration.
+	work_dur: Duration,
+
+	/// How much time computer have to be idle to disable work time counting.
+	idle_dur: Duration,
+    }
+
+    impl Work {
+	/// Returns a new work time counter.
+	pub fn new(work_dur: Duration, idle_dur: Duration) -> Self {
+	    Self {
+		work_dur,
+		idle_dur,
+	    }
+	}
+
+	/// Starts a work time counter.
+	pub fn count(&self) {
+	    let mut ctr = 0;
+	    let idle_dur = self.idle_dur.as_secs();
+	    let work_dur = self.work_dur.as_secs();
+
+	    self.trigger();
+	    while ctr < work_dur {
+		if idle_time() < idle_dur {
+		    wait(1);
+		    ctr += 1;
 		} else {
-		    ctr -= idle_dur;
-		}
+		    if (ctr as i32 - idle_dur as i32) <= 0 {
+			ctr = 0;
+		    } else {
+			ctr -= idle_dur;
+		    }
 
-		self.idle_trigger();
-		loop {
-		    if idle_time() == 0 {
-			self.work_resumed_trigger();
-			break;
+		    self.idle_trigger();
+		    loop {
+			if idle_time() == 0 {
+			    self.work_resumed_trigger();
+			    break;
+			}
 		    }
 		}
 	    }
 	}
-    }
 
-    /// Function to run when it is time to work.
-    fn trigger(&self) {
-	Notification::new()
-	    .summary("Take a breath: Work")
-	    .body("It's time to work.")
-	    .timeout(Timeout::Milliseconds(5000))
-	    .show()
-	    .unwrap();
-    }
+	/// Function to run when it is time to work.
+	fn trigger(&self) {
+	    Notification::new()
+		.summary("Take a breath: Work")
+		.body("It's time to work.")
+		.timeout(Timeout::Milliseconds(5000))
+		.show()
+		.unwrap();
+	}
 
-    /// Function to run when idle while work.
-    fn idle_trigger(&self) {
-	Notification::new()
-	    .summary("Take a breath: Work Idle")
-	    .body("Idle while work counter started")
-	    .timeout(Timeout::Milliseconds(5000))
-	    .show()
-	    .unwrap();
-    }
+	/// Function to run when idle while work.
+	fn idle_trigger(&self) {
+	    Notification::new()
+		.summary("Take a breath: Work Idle")
+		.body("Idle while work counter started")
+		.timeout(Timeout::Milliseconds(5000))
+		.show()
+		.unwrap();
+	}
 
-    /// Function to run when work has been resumed.
-    fn work_resumed_trigger(&self) {
-	Notification::new()
-	    .summary("Take a breath: Work Resumed")
-	    .body("Work has been resumed")
-	    .timeout(Timeout::Milliseconds(5000))
-	    .show()
-	    .unwrap();
-    }
-}
-
-/// Rest time counter structure.
-pub struct Rest {
-    /// Rest duration.
-    rest_dur: Duration,
-}
-
-impl Rest {
-    /// Returns a new rest time counter.
-    pub fn new(rest_dur: Duration) -> Self {
-	Self {
-	    rest_dur,
+	/// Function to run when work has been resumed.
+	fn work_resumed_trigger(&self) {
+	    Notification::new()
+		.summary("Take a breath: Work Resumed")
+		.body("Work has been resumed")
+		.timeout(Timeout::Milliseconds(5000))
+		.show()
+		.unwrap();
 	}
     }
 
-    /// Starts a rest time counter.
-    pub fn count(&self) {
-	let mut ctr = 0;
-	let rest_dur = self.rest_dur.as_secs();
+    /// Rest time counter structure.
+    pub struct Rest {
+	/// Rest duration.
+	rest_dur: Duration,
+    }
 
-	self.trigger();
-	while ctr < rest_dur {
-	    wait(1);
-	    if idle_time() > 0 {
-		ctr += 1;
-	    } else {
-		self.short_rest_trigger();
-		loop {
-		    if idle_time() > 0 {
-			self.rest_resumed_trigger();
-			break;
+    impl Rest {
+	/// Returns a new rest time counter.
+	pub fn new(rest_dur: Duration) -> Self {
+	    Self {
+		rest_dur,
+	    }
+	}
+
+	/// Starts a rest time counter.
+	pub fn count(&self) {
+	    let mut ctr = 0;
+	    let rest_dur = self.rest_dur.as_secs();
+
+	    self.trigger();
+	    while ctr < rest_dur {
+		wait(1);
+		if idle_time() > 0 {
+		    ctr += 1;
+		} else {
+		    self.short_rest_trigger();
+		    loop {
+			if idle_time() > 0 {
+			    self.rest_resumed_trigger();
+			    break;
+			}
 		    }
 		}
 	    }
 	}
+
+	/// Function to run when it is time to take a breath.
+	fn trigger(&self) {
+	    Notification::new()
+		.summary("Take a breath")
+		.body("It's time to take a breath.")
+		.timeout(Timeout::Milliseconds(5000))
+		.show()
+		.unwrap();
+	}
+
+	/// Function to run when the rest is too short.
+	fn short_rest_trigger(&self) {
+	    Notification::new()
+		.summary("Take a breath")
+		.body("You had too little rest!")
+		.timeout(Timeout::Milliseconds(10000))
+		.show()
+		.unwrap();
+	}
+
+	/// Function to run when rest has been resumed.
+	fn rest_resumed_trigger(&self) {
+	    Notification::new()
+		.summary("Take a breath")
+		.body("Rest has been resumed.")
+		.timeout(Timeout::Milliseconds(5000))
+		.show()
+		.unwrap();
+	}
     }
 
-    /// Function to run when it is time to take a breath.
-    fn trigger(&self) {
-	Notification::new()
-	    .summary("Take a breath")
-	    .body("It's time to take a breath.")
-	    .timeout(Timeout::Milliseconds(5000))
-	    .show()
-	    .unwrap();
+    /// Wait some time in seconds.
+    fn wait(secs: u64) {
+	thread::sleep(Duration::from_secs(secs));
     }
 
-    /// Function to run when the rest is too short.
-    fn short_rest_trigger(&self) {
-	Notification::new()
-	    .summary("Take a breath")
-	    .body("You had too little rest!")
-	    .timeout(Timeout::Milliseconds(10000))
-	    .show()
-	    .unwrap();
+    /// Get computer idle time.
+    fn idle_time() -> u64 {
+	UserIdle::get_time().unwrap().as_seconds()
     }
-
-    /// Function to run when rest has been resumed.
-    fn rest_resumed_trigger(&self) {
-	Notification::new()
-	    .summary("Take a breath")
-	    .body("Rest has been resumed.")
-	    .timeout(Timeout::Milliseconds(5000))
-	    .show()
-	    .unwrap();
-    }
-}
-
-/// Wait some time in seconds.
-fn wait(secs: u64) {
-    thread::sleep(Duration::from_secs(secs));
-}
-
-/// Get computer idle time.
-fn idle_time() -> u64 {
-    UserIdle::get_time().unwrap().as_seconds()
 }

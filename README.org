@@ -1,8 +1,14 @@
 * Take Breath
+  :PROPERTIES:
+  :CUSTOM_ID: introdution
+  :END:
   Take Breath is a program that reminds you when it is time to take a breath
   from your computer.
 
 * Algorithm
+  :PROPERTIES:
+  :CUSTOM_ID: algorithm
+  :END:
   When the program starts, it starts a work time counter. When the work time
   counter is greater than 45 minutes, program notifies you to take a breath and
   starts a computer idle time counter. When the computer idle time counter is
@@ -10,10 +16,13 @@
   should rest more. Otherwise it starts a work time counter again.
 
 * Roadmap
+  :PROPERTIES:
+  :CUSTOM_ID: roadmap
+  :END:
   - [X] Basic algorithm implementation
   - [X] Handle idle while work
   - [X] Split app into library and binary parts
-  - [ ] Customization features
+  - [X] Customization features
   - [ ] CLI implementation
   - [ ] Better error handling
   - [ ] Documentation
@@ -23,6 +32,9 @@
     - [ ] Windows
 
 * Building
+  :PROPERTIES:
+  :CUSTOM_ID: building
+  :END:
   In order to compile Take Breath program you should have [[https://www.rust-lang.org/tools/install][Rust toolchain]]
   installed. If you have, just run the following shell commands:
   #+BEGIN_SRC bash
@@ -37,13 +49,53 @@
   take-breath file into the ~/.cargo/bin directory.
 
 * Usage
+  :PROPERTIES:
+  :CUSTOM_ID: usage
+  :END:
   *Note that for now only Linux is supported by the program*
 
   Just run the following command in a terminal: "~take-breath
   &~". It executes ~take-breath~ program as a background process.
 
+* Customization
+  :PROPERTIES:
+  :CUSTOM_ID: customization
+  :END:
+  When you first start a program, it will automatically create ~take-breath~
+  configuration directory with config.toml file in the one of the following
+  directories depending on the system:
+  | Platform | Value                             |
+  |----------+-----------------------------------|
+  | Linux    | $XDG_CONFIG_HOME or $HOME/.config |
+  | macOS    | $HOME/Library/Application Support |
+  | Windows  | %USERPROFILE%\AppData\Roaming     |
+  After creation config file has the following data:
+  #+begin_src toml
+[work_time]
+duration = '45m'
+idle_to_pause = '2m'
+
+[rest_time]
+duration = '15m'
+  #+end_src
+  This file is written in the [[https://toml.io][TOML]] format.
+  Description of each field:
+  | Field                   | Description                                                       | Default Value |
+  |-------------------------+-------------------------------------------------------------------+---------------|
+  | work_time.duration      | Work duration                                                     | 45m           |
+  | work_time.idle_to_pause | How much time computer have to be idle to pause work time counter | 2m            |
+  | rest_time.duration      | Rest duration                                                     | 15m           |
+
+
+
 * License
+  :PROPERTIES:
+  :CUSTOM_ID: license
+  :END:
   Take Breath is provided under [[./LICENSE][MIT License]].
 
 * Contribution
+  :PROPERTIES:
+  :CUSTOM_ID: contribution
+  :END:
   Contributions are welcome.
