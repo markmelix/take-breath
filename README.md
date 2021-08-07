@@ -1,3 +1,6 @@
+<a href="https://docs.rs/take-breath"><img src="https://docs.rs/take-breath/badge.svg"></a><a href="https://crates.io/crates/take-breath"><img src="https://img.shields.io/crates/v/take-breath.svg"></a><a href="./LICENSE"><img src="https://img.shields.io/crates/l/take-breath.svg"></a>
+
+
 # Table of Contents
 
 1.  [Take Breath](#introdution)
@@ -8,12 +11,6 @@
 6.  [Customization](#customization)
 7.  [License](#license)
 8.  [Contribution](#contribution)
-
-<a href="https://docs.rs/take-breath"><img src="https://docs.rs/take-breath/badge.svg"></a>
-
-<a href="https://crates.io/crates/take-breath"><img src="https://img.shields.io/crates/v/take-breath.svg"></a>
-
-<a href="./LICENSE"><img src="https://img.shields.io/crates/l/take-breath.svg"></a>
 
 
 <a id="introdution"></a>
@@ -43,13 +40,15 @@ should rest more. Otherwise it starts a work time counter again.
 -   [X] Handle idle while work
 -   [X] Split app into library and binary parts
 -   [X] Customization features
+-   [ ] Action customization features
+-   [X] Better error handling
+-   [ ] Auto-start features
 -   [ ] CLI implementation
--   [ ] Better error handling
 -   [ ] Documentation
 -   [-] Support for various operating systems
 	-   [X] Linux (X only)
-	-   [ ] Mac
-	-   [ ] Windows
+	-   [ ] Mac (not tested)
+	-   [ ] Windows (not tested)
 
 
 <a id="building"></a>
