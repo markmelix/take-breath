@@ -8,16 +8,19 @@ categories  = ["accessibility", "command-line-utilities", "date-and-time"]
 license     = "MIT"
 readme      = "README.md"
 edition     = "2018"
-version     = "0.1.4"
+version     = "0.1.5"
 
 [dependencies]
-notify-rust = "4.5.2"
-toml = "0.5.8"
-user-idle = "0.5.0"
-humantime-serde = "1.0.1"
-humantime = "2.1.0"
-dirs = "3.0.2"
+user-idle       = { version = "0.5.0" }
+clap            = { version = "2.33.3" , optional = true }
+notify-rust     = { version = "4.5.2"  , optional = true }
+dirs            = { version = "3.0.2"  , optional = true }
+toml            = { version = "0.5.8"  , optional = true }
+serde           = { version = "1.0.127", features = ["derive"], optional = true }
+humantime-serde = { version = "1.0.1"  , optional = true }
 
-[dependencies.serde]
-version = "1.0.127"
-features = ["derive"]
+[features]
+default = ["notify", "config", "cli"]
+notify  = ["notify-rust"]
+config  = ["serde/derive", "humantime-serde", "toml", "dirs"]
+cli     = ["clap"]

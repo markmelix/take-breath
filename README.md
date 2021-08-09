@@ -9,10 +9,11 @@
 2.  [Algorithm](#algorithm)
 3.  [Roadmap](#roadmap)
 4.  [Building](#building)
-5.  [Usage](#usage)
-6.  [Customization](#customization)
-7.  [License](#license)
-8.  [Contribution](#contribution)
+5.  [Compilation features](#orgd996782)
+6.  [Usage](#usage)
+7.  [Customization](#customization)
+8.  [License](#license)
+9.  [Contribution](#contribution)
 
 
 <a id="introdution"></a>
@@ -42,6 +43,7 @@ should rest more. Otherwise it starts a work time counter again.
 -   [X] Handle idle while work
 -   [X] Split app into library and binary parts
 -   [X] Customization features
+-   [X] Compilation features
 -   [ ] Action customization features
 -   [X] Better error handling
 -   [ ] Auto-start features
@@ -69,6 +71,70 @@ It puts compiled `take-breath` file into the ./target/release directory.
 You can also get compiled take-breath program without cloning the repository
 using the following command: "cargo install take-breath". It puts compiled
 take-breath file into the ~/.cargo/bin directory.
+
+
+<a id="orgd996782"></a>
+
+# Compilation features
+
+Compilation features allow you to use only those program features that you
+need. For example, if you don't use configuration files or notifications, you
+can disable these features. Description of each feature:
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-left">Description</th>
+<th scope="col" class="org-left">Dependencies</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td class="org-left">notify</td>
+<td class="org-left">notifications</td>
+<td class="org-left">notify-rust</td>
+</tr>
+
+
+<tr>
+<td class="org-left">config</td>
+<td class="org-left">configuration files</td>
+<td class="org-left">serde/derive, humantime-serde, toml, dirs</td>
+</tr>
+
+
+<tr>
+<td class="org-left">cli</td>
+<td class="org-left">cli features</td>
+<td class="org-left">clap</td>
+</tr>
+</tbody>
+</table>
+
+By default, all of these features are activated. If you want to use only
+specific features, add `--no-default-features --features` at the end of the
+cargo build/install command. For example:
+
+	# Activate only config and cli features. So, we can configure the program using
+	# configuration file (see customization section) and command arguments.
+	cargo build --release --no-default-features --features config,cli # if you build program manually
+	cargo install --no-default-features --features config,cli # if you use cargo install
+
+	# Activate only notify feature. So, we cannot configure program at all, but we
+	# can see notification messages to get information.
+	cargo build --release --no-default-features --features notify # if you build program manually
+	cargo install --no-default-features --features notify # if you use cargo install
 
 
 <a id="usage"></a>

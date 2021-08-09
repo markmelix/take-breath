@@ -1,4 +1,11 @@
+use std::time::Duration;
+pub const DEFAULT_WORK_DUR: Duration = Duration::from_secs(45 * 60);
+pub const DEFAULT_WORK_IDLE_TO_PAUSE: Duration = Duration::from_secs(2 * 60);
+pub const DEFAULT_REST_DUR: Duration = Duration::from_secs(15 * 60);
+
+#[cfg(feature = "config")]
 pub mod config {
+    use super::*;
     use toml;
     use std::path::Path;
     use serde::{Serialize, Deserialize};
@@ -42,11 +49,11 @@ pub mod config {
 
     impl WorkTime {
 	fn default_duration() -> Duration {
-	    Duration::from_secs(45 * 60)
+	    DEFAULT_WORK_DUR
 	}
 
 	fn default_idle_to_pause() -> Duration {
-	    Duration::from_secs(2 * 60)
+	    DEFAULT_WORK_IDLE_TO_PAUSE
 	}
     }
 
@@ -68,7 +75,7 @@ pub mod config {
 
     impl RestTime {
 	fn default_duration() -> Duration {
-	    Duration::from_secs(15 * 60)
+	    DEFAULT_REST_DUR
 	}
     }
 
@@ -82,6 +89,7 @@ pub mod config {
 }
 
 pub mod counter {
+    #[cfg(feature = "notify")]
     use notify_rust::{Notification, Timeout};
     use user_idle::UserIdle;
     use std::time::Duration;
@@ -98,7 +106,8 @@ pub mod counter {
 
     impl Work {
 	/// Returns a new work time counter.
-	pub fn new(work_dur: Duration, idle_dur: Duration) -> Self {
+	pub fn new(work_dur: Duration,
+		   idle_dur: Duration) -> Self {
 	    Self {
 		work_dur,
 		idle_dur,
@@ -136,6 +145,8 @@ pub mod counter {
 
 	/// Function to run when it is time to work.
 	fn trigger(&self) {
+	    println!("It's time to work.");
+	    #[cfg(feature = "notify")]
 	    Notification::new()
 		.summary("Take a breath: Work")
 		.body("It's time to work.")
@@ -146,9 +157,11 @@ pub mod counter {
 
 	/// Function to run when idle while work.
 	fn idle_trigger(&self) {
+	    println!("Idle while work counter started.");
+	    #[cfg(feature = "notify")]
 	    Notification::new()
 		.summary("Take a breath: Work Idle")
-		.body("Idle while work counter started")
+		.body("Idle while work counter started.")
 		.timeout(Timeout::Milliseconds(5000))
 		.show()
 		.unwrap();
@@ -156,9 +169,11 @@ pub mod counter {
 
 	/// Function to run when work has been resumed.
 	fn work_resumed_trigger(&self) {
+	    println!("Work has been resumed.");
+	    #[cfg(feature = "notify")]
 	    Notification::new()
 		.summary("Take a breath: Work Resumed")
-		.body("Work has been resumed")
+		.body("Work has been resumed.")
 		.timeout(Timeout::Milliseconds(5000))
 		.show()
 		.unwrap();
@@ -203,6 +218,8 @@ pub mod counter {
 
 	/// Function to run when it is time to take a breath.
 	fn trigger(&self) {
+	    println!("It's time ti take a breath.");
+	    #[cfg(feature = "notify")]
 	    Notification::new()
 		.summary("Take a breath")
 		.body("It's time to take a breath.")
@@ -214,6 +231,8 @@ pub mod counter {
 	/// Function to run when the rest is too short.
 	fn short_rest_trigger(&self, ctr: Duration) {
 	    let left = (self.rest_dur - ctr).as_secs() as f32 / 60.0;
+	    println!("You had too little rest! {:.2} minutes left.", left);
+	    #[cfg(feature = "notify")]
 	    Notification::new()
 		.summary("Take a breath")
 		.body(&format!("You had too little rest!\n{:.2} minutes left.", left))
@@ -224,6 +243,8 @@ pub mod counter {
 
 	/// Function to run when rest has been resumed.
 	fn rest_resumed_trigger(&self) {
+	    println!("Rest has been resumed.");
+	    #[cfg(feature = "notify")]
 	    Notification::new()
 		.summary("Take a breath")
 		.body("Rest has been resumed.")

@@ -34,6 +34,7 @@
   - [X] Handle idle while work
   - [X] Split app into library and binary parts
   - [X] Customization features
+  - [X] Compilation features
   - [ ] Action customization features
   - [X] Better error handling
   - [ ] Auto-start features
@@ -60,6 +61,30 @@
   You can also get compiled take-breath program without cloning the repository
   using the following command: "cargo install take-breath". It puts compiled
   take-breath file into the ~/.cargo/bin directory.
+
+* Compilation features
+  Compilation features allow you to use only those program features that you
+  need. For example, if you don't use configuration files or notifications, you
+  can disable these features. Description of each feature:
+  | Name   | Description         | Dependencies                              |
+  |--------+---------------------+-------------------------------------------|
+  | notify | notifications       | notify-rust                               |
+  | config | configuration files | serde/derive, humantime-serde, toml, dirs |
+  | cli    | cli features        | clap                                      |
+  By default, all of these features are activated. If you want to use only
+  specific features, add ~--no-default-features --features~ at the end of the
+  cargo build/install command. For example:
+  #+begin_src bash
+    # Activate only config and cli features. So, we can configure the program using
+    # configuration file (see customization section) and command arguments.
+    cargo build --release --no-default-features --features config,cli # if you build program manually
+    cargo install --no-default-features --features config,cli # if you use cargo install
+
+    # Activate only notify feature. So, we cannot configure program at all, but we
+    # can see notification messages to get information.
+    cargo build --release --no-default-features --features notify # if you build program manually
+    cargo install --no-default-features --features notify # if you use cargo install
+  #+end_src
 
 * Usage
   :PROPERTIES:
