@@ -1,18 +1,22 @@
-use std::time::Duration;
-pub const DEFAULT_WORK_DUR: Duration = Duration::from_secs(45 * 60);
-pub const DEFAULT_WORK_IDLE_TO_PAUSE: Duration = Duration::from_secs(2 * 60);
-pub const DEFAULT_REST_DUR: Duration = Duration::from_secs(15 * 60);
-
-#[cfg(feature = "config")]
 pub mod config {
-    use super::*;
-    use toml;
-    use std::path::Path;
-    use serde::{Serialize, Deserialize};
     use std::time::Duration;
-    use std::error::Error;
-    use std::fs;
 
+    const DEFAULT_WORK_DUR: Duration = Duration::from_secs(45 * 60);
+    const DEFAULT_WORK_IDLE_TO_PAUSE: Duration = Duration::from_secs(2 * 60);
+    const DEFAULT_REST_DUR: Duration = Duration::from_secs(15 * 60);
+
+    #[cfg(feature = "config")]
+    use std::fs;
+    #[cfg(feature = "config")]
+    use std::error::Error;
+    #[cfg(feature = "config")]
+    use toml;
+    #[cfg(feature = "config")]
+    use std::path::Path;
+    #[cfg(feature = "config")]
+    use serde::{Serialize, Deserialize};
+
+    #[cfg(feature = "config")]
     #[derive(Serialize, Deserialize, Default, Debug)]
     pub struct Config {
 	#[serde(default)]
@@ -22,6 +26,15 @@ pub mod config {
 	pub rest_time: RestTime,
     }
 
+    #[cfg(not(feature = "config"))]
+    #[derive(Default, Debug)]
+    pub struct Config {
+	pub work_time: WorkTime,
+
+	pub rest_time: RestTime,
+    }
+
+    #[cfg(feature = "config")]
     impl Config {
 	pub fn from_file<T: AsRef<Path>>(path: T) -> Result<Self, Box<dyn Error>> {
 	    let file_data = fs::read_to_string(path)?;
@@ -36,6 +49,7 @@ pub mod config {
 	}
     }
 
+    #[cfg(feature = "config")]
     #[derive(Serialize, Deserialize, Debug)]
     pub struct WorkTime {
 	#[serde(with = "humantime_serde")]
@@ -44,6 +58,13 @@ pub mod config {
 
 	#[serde(with = "humantime_serde")]
 	#[serde(default = "WorkTime::default_idle_to_pause")]
+	pub idle_to_pause: Duration,
+    }
+
+    #[cfg(not(feature = "config"))]
+    #[derive(Debug)]
+    pub struct WorkTime {
+	pub duration: Duration,
 	pub idle_to_pause: Duration,
     }
 
@@ -66,10 +87,17 @@ pub mod config {
 	}
     }
 
+    #[cfg(feature = "config")]
     #[derive(Serialize, Deserialize, Debug)]
     pub struct RestTime {
 	#[serde(with = "humantime_serde")]
 	#[serde(default = "RestTime::default_duration")]
+	pub duration: Duration,
+    }
+
+    #[cfg(not(feature = "config"))]
+    #[derive(Debug)]
+    pub struct RestTime {
 	pub duration: Duration,
     }
 
